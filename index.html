@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<meta http-equiv=X-UA-Compatible content="IE=edge">
+<title>Gong-Fu</title>
+</head>
+<body>
+<div>
+Initial steeping <input type=number id=initial min=0 style="width: 4em;" /><br />
+Incremental time <input type=number id=incremental min=0 style="width: 4em;" /><br />
+<button id=prepare>Prepare</button><br />
+<br />
+</div>
+<div>
+<div id=label><div style="color: #808080;">Set up your steeping above</div></div>
+<div id=timer style="font-family: monospace; font-size: larger;"></div>
+</div>
+<script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+var timer = null;
+var endTime = null;
+
+var initialTime = null;
+var incrementalTime = null
+var steeping = null;
+
+var noise = null;
+
+$("#prepare").click(function() {
+  initialTime = parseInt(document.getElementById("initial").value);
+  incrementalTime = parseInt(document.getElementById("incremental").value);
+  steeping = 0;
+
+  $("#prepare").html("Reset");
+
+  renderSchedule();
+});
+
+function renderSchedule()
+{
+  var content = "<table border=\"1\">";
+  var style = "color: #A0A0A0;";
+  for (var steep = 0; steep <= steeping; ++steep)
+  {
+    if (steep == steeping)
+    {
+      style = "";
+    }
+    content += "<tr><td style=\"" + style + "\">" + (steep + 1) + "</td><td style=\"" + style + "\">" + (initialTime + incrementalTime * steep) + " seconds</td></tr>";
+  }
+  content += "</table><br /><button id=begin>Begin</button> | <button id=back>/\\</button> <button id=skip>\\/</button>";
+
+  $("#label").html(content);
+
+  $("#begin").click(function() {
+    pokeTimer(initialTime + incrementalTime * steeping);
+  });
+
+  $("#skip").click(function() {
+    steeping += 1;
+    renderSchedule();
+  });
+
+  $("#back").click(function() {
+    if (steeping > 0)
+    {
+      steeping -= 1;
+      renderSchedule();
+    }
+  });
+}
+
+function pokeTimer(seconds)
+{
+  if (timer === null)
+  {
+    endTime = Date.now() + seconds * 1000;
+    onTimer();
+    timer = window.setInterval(onTimer, 100);
+    $("#begin").html("Stop");
+  }
+  else
+  {
+    window.clearInterval(timer);
+    timer = null;
+    $("#timer").html(getText(0));
+    $("#begin").html("Begin");
+  }
+}
+
+function onTimer() 
+{
+  var timeLeft = endTime - Date.now();
+  
+  $("#timer").html(getText(timeLeft));
+
+  if (timeLeft <= 0)
+  {
+    if (noise === null)
+    {
+      noise = new Audio("ding.wav");
+    }
+
+    noise.play();
+    pokeTimer();
+
+    steeping += 1;
+    renderSchedule();
+  }
+}
+
+function getText(timeleft)
+{
+  return padDigits(Math.floor(timeleft/1000), 2) + "." +  + padDigits(Math.floor(timeleft%1000/100), 2);
+}
+
+function padDigits(number, digits) {
+    return Array(Math.max(digits - String(number).length + 1, 0)).join(0) + number;
+}
+
+</script>
+</body>
+</html>
