@@ -57,6 +57,12 @@ function renderSchedule()
   $("#begin").click(function() {
     pokeTimer(initialTime + incrementalTime * steeping);
   });
+  
+  $(document).keydown(function(event) {
+    if (event.which == 32) {
+      pokeTimer(initialTime + incrementalTime * steeping);
+    }
+  });
 
   $("#skip").click(function() {
     steeping += 1;
@@ -98,17 +104,22 @@ function onTimer()
 
   if (timeLeft <= 0)
   {
-    if (noise === null)
-    {
-      noise = new Audio("ding.wav");
-    }
-
-    noise.play();
+    makeNoise();
     pokeTimer();
 
     steeping += 1;
     renderSchedule();
   }
+}
+
+function makeNoise()
+{
+  if (noise === null)
+  {
+    noise = new Audio("ding.wav");
+  }
+
+  noise.play();
 }
 
 function getText(timeleft)
