@@ -37,6 +37,12 @@ $("#prepare").click(function() {
 
   renderSchedule();
 });
+  
+$(document).keydown(function(event) {
+  if (event.which == 32) {
+    pokeTimer(initialTime + incrementalTime * steeping);
+  }
+});
 
 function renderSchedule()
 {
@@ -56,12 +62,6 @@ function renderSchedule()
 
   $("#begin").click(function() {
     pokeTimer(initialTime + incrementalTime * steeping);
-  });
-  
-  $(document).keydown(function(event) {
-    if (event.which == 32) {
-      pokeTimer(initialTime + incrementalTime * steeping);
-    }
   });
 
   $("#skip").click(function() {
